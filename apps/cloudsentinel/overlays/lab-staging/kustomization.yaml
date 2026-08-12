@@ -11,10 +11,10 @@ patches:
 images:
   - name: cloudsentinel-api
     newName: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-api
-    digest: sha256:b2f919d2d148cd988d6ccf698833f6dd3a6fd4604e25a26719bc52cd11d4410b
+    digest: sha256:4d762f0ca2c1443d511e17eca29eb4ac76ac9b06a519aeba01c0748431bdde91
   - name: cloudsentinel-worker
     newName: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-worker
-    digest: sha256:78b34086c463178daa11c6f1306f6787900ab3c7bf802b03b9d2b553f5d31865
+    digest: sha256:20b104772683b279a7dd94f41c40f62ab4948424e26ccfdfe29dd8e4d74c37b3
   - name: cloudsentinel-migrate
     newName: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-migrate
-    digest: sha256:03158c8cadfcb167b00463462c7cf8bf132505a35da78eb51487a854d7127b9f
+    digest: sha256:b663611e656aa3c14445526ae5ab62890a0e0288262444c245a89ff46e7074c5
