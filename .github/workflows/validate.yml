@@ -65,6 +65,8 @@ jobs:
             echo 'workloads must use the ACR VPC endpoint, not the public push endpoint.' >&2
             exit 1
           fi
-          kubectl kustomize bootstrap/secret-store >/dev/null
+          secret_store_output="$(mktemp)"
+          kubectl kustomize bootstrap/secret-store >"${secret_store_output}"
+          test "$(grep -Ec '^[[:space:]]+- argocd$' "${secret_store_output}")" -eq 1
           kubectl kustomize platform/cloudsentinel-secrets/overlays/lab-data >/dev/null
           kubectl kustomize bootstrap/argocd >/dev/null
