@@ -20,6 +20,8 @@ spec:
   template:
     metadata:
       name: cloudsentinel-{{.environment}}
+      annotations:
+        argocd.argoproj.io/compare-options: ServerSideDiff=true
       labels:
         app.kubernetes.io/part-of: cloudsentinel
         environment.cloudsentinel.io/name: "{{.environment}}"
