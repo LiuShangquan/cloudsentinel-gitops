@@ -23,3 +23,6 @@ images:
   - name: cloudsentinel-migrate
     newName: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-migrate
     digest: sha256:03158c8cadfcb167b00463462c7cf8bf132505a35da78eb51487a854d7127b9f
+  - name: cloudsentinel-web
+    newName: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-web
+    digest: sha256:c578ab9e979a18630aa111eb9b3afc05d1d0b18e5ab903a04cdf371a7ab9f7b6
