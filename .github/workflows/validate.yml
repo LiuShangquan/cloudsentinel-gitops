@@ -51,8 +51,16 @@ jobs:
               exit 1
             fi
             grep -Eq 'image: .+@sha256:[0-9a-f]{64}$' "${output}"
-            image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof-vpc\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(api|worker|migrate|web)@sha256:[0-9a-f]{64}$' "${output}")"
-            test "${image_count}" -eq 4
+            for component in api worker migrate; do
+              component_image_count="$(grep -Ec "image: crpi-1s64ln3ptbvgkqof-vpc\\.cn-beijing\\.personal\\.cr\\.aliyuncs\\.com/cloudsentinel0306/cloudsentinel-${component}@sha256:[0-9a-f]{64}$" "${output}")"
+              test "${component_image_count}" -eq 1
+            done
+            web_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof-vpc\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-web@sha256:[0-9a-f]{64}$' "${output}")"
+            if [[ "${environment}" == "lab-staging" ]]; then
+              test "${web_image_count}" -eq 2
+            else
+              test "${web_image_count}" -eq 1
+            fi
           done
           migration_job=apps/cloudsentinel/base/migration-job.yaml
           grep -q '^      serviceAccountName: default$' "${migration_job}"
