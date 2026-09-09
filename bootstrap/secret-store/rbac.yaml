@@ -14,6 +14,7 @@ rules:
       - cloudsentinel-monitoring
       - cloudsentinel-grafana-public-tls
       - cloudsentinel-web-public-tls
+      - cloudsentinel-production-web-public-tls
     verbs: ["get"]
   - apiGroups: ["authorization.k8s.io"]
     resources: ["selfsubjectaccessreviews", "selfsubjectrulesreviews"]

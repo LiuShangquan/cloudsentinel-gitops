@@ -11,6 +11,12 @@ Argo CD ApplicationSet 已指向 `compact-lab-staging` 与
 `platform/cloudsentinel-data/overlays/lab-compact`，监控入口是
 `platform/cloudsentinel-monitoring/overlays/lab-compact`。
 
+河源公网边缘入口固定在 `worker-02`：Staging Web 使用 HTTPS NodePort
+`30443`，Production Web 使用独立证书源 Secret
+`cloudsentinel-production-web-public-tls` 和 HTTPS NodePort `30444`，Grafana
+使用 `30300`。Production 继续保持人工 Sync，`externalTrafficPolicy: Local`
+确保其 NodePort 只在存在本地 Web Endpoint 的边缘节点接收流量。
+
 原 `lab-*`、数据 `overlays/lab` 和监控 `overlays/lab` 继续保存北京七节点历史
 基线，不应改写成河源拓扑。Compact 数据层仍是单副本 MySQL/Redis、静态 Retain
 Local PV、NetworkPolicy 和逻辑备份 CronJob，不是高可用生产方案。
