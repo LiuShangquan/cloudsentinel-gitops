@@ -11,9 +11,9 @@ metadata:
 spec:
   project: cloudsentinel-platform
   source:
-    repoURL: git@github.com:LiuShangquan/cloudsentinel-gitops.git
+    repoURL: https://github.com/LiuShangquan/cloudsentinel-gitops.git
     targetRevision: main
-    path: platform/cloudsentinel-monitoring/overlays/lab
+    path: platform/cloudsentinel-monitoring/overlays/lab-compact
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
@@ -33,4 +33,3 @@ spec:
         duration: 10s
         factor: 2
         maxDuration: 3m
-

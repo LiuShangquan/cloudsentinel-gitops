@@ -23,9 +23,13 @@ jobs:
             apps/cloudsentinel/base
             apps/cloudsentinel/overlays/lab-staging
             apps/cloudsentinel/overlays/lab-production
+            apps/cloudsentinel/overlays/compact-lab-staging
+            apps/cloudsentinel/overlays/compact-lab-production
             bootstrap
             platform/cloudsentinel-data/overlays/lab
+            platform/cloudsentinel-data/overlays/lab-compact
             platform/cloudsentinel-monitoring/overlays/lab
+            platform/cloudsentinel-monitoring/overlays/lab-compact
             platform/cloudsentinel-secrets/overlays/lab-staging
             platform/cloudsentinel-secrets/overlays/lab-production
             platform/cloudsentinel-secrets/overlays/lab-data
@@ -39,7 +43,7 @@ jobs:
             echo 'Monitoring image digests must be populated by the mirror workflow before merge.' >&2
             exit 1
           fi
-          for environment in lab-staging lab-production; do
+          for environment in compact-lab-staging compact-lab-production; do
             output="$(mktemp)"
             kubectl kustomize "apps/cloudsentinel/overlays/${environment}" >"${output}"
             if grep -Eq '^kind: (Secret|StatefulSet)$' "${output}"; then
@@ -52,11 +56,11 @@ jobs:
             fi
             grep -Eq 'image: .+@sha256:[0-9a-f]{64}$' "${output}"
             for component in api worker migrate; do
-              component_image_count="$(grep -Ec "image: crpi-1s64ln3ptbvgkqof-vpc\\.cn-beijing\\.personal\\.cr\\.aliyuncs\\.com/cloudsentinel0306/cloudsentinel-${component}@sha256:[0-9a-f]{64}$" "${output}")"
+              component_image_count="$(grep -Ec "image: crpi-1s64ln3ptbvgkqof\\.cn-beijing\\.personal\\.cr\\.aliyuncs\\.com/cloudsentinel0306/cloudsentinel-${component}@sha256:[0-9a-f]{64}$" "${output}")"
               test "${component_image_count}" -eq 1
             done
-            web_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof-vpc\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-web@sha256:[0-9a-f]{64}$' "${output}")"
-            if [[ "${environment}" == "lab-staging" ]]; then
+            web_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-web@sha256:[0-9a-f]{64}$' "${output}")"
+            if [[ "${environment}" == "compact-lab-staging" ]]; then
               test "${web_image_count}" -eq 2
             else
               test "${web_image_count}" -eq 1
@@ -68,7 +72,7 @@ jobs:
           grep -A1 '^      imagePullSecrets:$' "${migration_job}" |
             grep -q '^        - name: cloudsentinel-registry$'
           data_output="$(mktemp)"
-          kubectl kustomize platform/cloudsentinel-data/overlays/lab >"${data_output}"
+          kubectl kustomize platform/cloudsentinel-data/overlays/lab-compact >"${data_output}"
           test "$(grep -c '^kind: StatefulSet$' "${data_output}")" -eq 2
           test "$(grep -c '^kind: PersistentVolume$' "${data_output}")" -eq 3
           test "$(grep -c '^  persistentVolumeReclaimPolicy: Retain$' "${data_output}")" -eq 3
@@ -76,23 +80,23 @@ jobs:
           test "$(grep -c 'argocd.argoproj.io/sync-wave: \"-30\"' "${data_output}")" -eq 12
           test "$(grep -c 'argocd.argoproj.io/sync-wave: \"-20\"' "${data_output}")" -eq 2
           test "$(grep -c 'argocd.argoproj.io/sync-wave: \"-10\"' "${data_output}")" -eq 1
-          test "$(grep -Ec '^[[:space:]]+node-role: data$' "${data_output}")" -eq 5
-          test "$(grep -Ec '^[[:space:]]+kubernetes.io/hostname: worker-data-01$' "${data_output}")" -eq 5
+          test "$(grep -Ec '^[[:space:]]+workload\.cloudsentinel\.io/data: "true"$' "${data_output}")" -eq 5
+          test "$(grep -Ec '^[[:space:]]+- worker-01$' "${data_output}")" -eq 3
           if grep -Eq '^  type: (NodePort|LoadBalancer)$' "${data_output}"; then
             echo 'data services must remain private ClusterIP services.' >&2
             exit 1
           fi
-          data_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof-vpc\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(mysql|redis)@sha256:[0-9a-f]{64}$' "${data_output}")"
+          data_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(mysql|redis)@sha256:[0-9a-f]{64}$' "${data_output}")"
           test "${data_image_count}" -eq 6
           monitoring_output="$(mktemp)"
-          kubectl kustomize platform/cloudsentinel-monitoring/overlays/lab >"${monitoring_output}"
+          kubectl kustomize platform/cloudsentinel-monitoring/overlays/lab-compact >"${monitoring_output}"
           test "$(grep -c '^kind: StatefulSet$' "${monitoring_output}")" -eq 2
           test "$(grep -c '^kind: Deployment$' "${monitoring_output}")" -eq 2
           test "$(grep -c '^kind: PersistentVolume$' "${monitoring_output}")" -eq 3
           test "$(grep -c '^  persistentVolumeReclaimPolicy: Retain$' "${monitoring_output}")" -eq 3
-          test "$(grep -Ec '^[[:space:]]+node-role: monitoring$' "${monitoring_output}")" -eq 4
-          test "$(grep -Ec '^[[:space:]]+kubernetes.io/hostname: worker-monitor$' "${monitoring_output}")" -eq 4
-          monitoring_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof-vpc\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(prometheus|alertmanager|grafana|metrics-server)@sha256:[0-9a-f]{64}$' "${monitoring_output}")"
+          test "$(grep -Ec '^[[:space:]]+workload\.cloudsentinel\.io/monitoring: "true"$' "${monitoring_output}")" -eq 4
+          test "$(grep -Ec '^[[:space:]]+- worker-02$' "${monitoring_output}")" -eq 3
+          monitoring_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(prometheus|alertmanager|grafana|metrics-server)@sha256:[0-9a-f]{64}$' "${monitoring_output}")"
           test "${monitoring_image_count}" -eq 4
           grep -Fq 'credentials_file: /etc/alertmanager/secrets/webhook-token' "${monitoring_output}"
           test "$(grep -c '^  type: NodePort$' "${monitoring_output}")" -eq 1
@@ -102,8 +106,8 @@ jobs:
           grep -Fq 'name: grafana-public' "${monitoring_output}"
           grep -Fq 'name: grafana-public-tls' "${monitoring_output}"
           test "$(grep -Ec '^[[:space:]]+- cloudsentinel-grafana-public-tls$' bootstrap/secret-store/rbac.yaml)" -eq 1
-          if grep -RIn 'newName: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com' apps; then
-            echo 'workloads must use the ACR VPC endpoint, not the public push endpoint.' >&2
+          if grep -RIn 'newName: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com' apps/cloudsentinel/base apps/cloudsentinel/overlays/lab-staging apps/cloudsentinel/overlays/lab-production; then
+            echo 'legacy Beijing overlays must retain the ACR VPC endpoint.' >&2
             exit 1
           fi
           kubectl kustomize bootstrap/secret-store >/dev/null

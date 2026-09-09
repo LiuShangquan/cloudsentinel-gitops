@@ -9,9 +9,9 @@ metadata:
 spec:
   project: cloudsentinel
   source:
-    repoURL: git@github.com:LiuShangquan/cloudsentinel-gitops.git
+    repoURL: https://github.com/LiuShangquan/cloudsentinel-gitops.git
     targetRevision: main
-    path: platform/cloudsentinel-data/overlays/lab
+    path: platform/cloudsentinel-data/overlays/lab-compact
   destination:
     server: https://kubernetes.default.svc
     namespace: cloudsentinel-data
