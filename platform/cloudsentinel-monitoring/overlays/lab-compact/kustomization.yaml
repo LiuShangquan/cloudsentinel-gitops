@@ -56,6 +56,10 @@ patches:
         value:
           - ipBlock:
               cidr: 172.23.122.231/32
+          - ipBlock:
+              cidr: 172.23.122.232/32
+          - ipBlock:
+              cidr: 172.23.122.233/32
 images:
   - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-prometheus
     newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-prometheus
