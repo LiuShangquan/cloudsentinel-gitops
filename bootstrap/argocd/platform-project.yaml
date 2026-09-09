@@ -6,7 +6,7 @@ metadata:
 spec:
   description: CloudSentinel cluster platform delivery boundary
   sourceRepos:
-    - git@github.com:LiuShangquan/cloudsentinel-gitops.git
+    - https://github.com/LiuShangquan/cloudsentinel-gitops.git
   destinations:
     - server: https://kubernetes.default.svc
       namespace: monitoring
@@ -46,4 +46,3 @@ spec:
       kind: ExternalSecret
   orphanedResources:
     warn: true
-

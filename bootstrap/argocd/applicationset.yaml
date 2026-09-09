@@ -10,11 +10,11 @@ spec:
     - list:
         elements:
           - environment: staging
-            overlay: lab-staging
+            overlay: compact-lab-staging
             namespace: cloudsentinel-staging
             autoSync: true
           - environment: production
-            overlay: lab-production
+            overlay: compact-lab-production
             namespace: cloudsentinel-production
             autoSync: false
   template:
@@ -28,7 +28,7 @@ spec:
     spec:
       project: cloudsentinel
       source:
-        repoURL: git@github.com:LiuShangquan/cloudsentinel-gitops.git
+        repoURL: https://github.com/LiuShangquan/cloudsentinel-gitops.git
         targetRevision: main
         path: apps/cloudsentinel/overlays/{{.overlay}}
       destination:

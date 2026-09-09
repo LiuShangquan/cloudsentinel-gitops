@@ -2,9 +2,18 @@
 
 此目录是一套可复制为独立私有仓库 `cloudsentinel-gitops` 的完整种子。正式启用后，源码仓库继续保留模板和发布脚本，Argo CD 只读取独立配置仓库；不要让 Argo CD 直接跟踪应用源码仓库。
 
-## 当前学生集群入口
+## 当前河源 Compact Lab 入口
 
-Argo CD ApplicationSet 已指向 `lab-staging` 与 `lab-production`；两者不创建 Ingress，允许先通过端口转发或后续单独入口方案访问。数据层位于 `platform/cloudsentinel-data/overlays/lab`，包含单副本 MySQL/Redis StatefulSet、静态 Retain 本地 PV、NetworkPolicy 和逻辑备份 CronJob。企业 RDS/Tair Overlay 继续保留，但当前不被 ApplicationSet 使用。
+Argo CD ApplicationSet 已指向 `compact-lab-staging` 与
+`compact-lab-production`。Compact Overlay 复用原七节点 Lab 资源，但把镜像拉取
+地址切换为北京 ACR 公网 Endpoint，并按组合式 Workload Label 调度到河源的
+`worker-01`、`worker-02`。数据层入口是
+`platform/cloudsentinel-data/overlays/lab-compact`，监控入口是
+`platform/cloudsentinel-monitoring/overlays/lab-compact`。
+
+原 `lab-*`、数据 `overlays/lab` 和监控 `overlays/lab` 继续保存北京七节点历史
+基线，不应改写成河源拓扑。Compact 数据层仍是单副本 MySQL/Redis、静态 Retain
+Local PV、NetworkPolicy 和逻辑备份 CronJob，不是高可用生产方案。
 
 ## 初始化前必须替换
 
@@ -13,9 +22,15 @@ Argo CD ApplicationSet 已指向 `lab-staging` 与 `lab-production`；两者不�
 - Staging/Production 的外部密钥对象路径；
 - Argo CD `repoURL` 与 CODEOWNERS 团队。
 
-`validate-gitops` 只对当前激活路径拒绝占位符，并渲染两个 `lab-*` 应用 Overlay、两个 Secret Overlay、数据层、Secret Store 和 Argo CD Bootstrap。`apps/` 保存应用期望状态；`bootstrap/secret-store` 由平台管理员先应用，`bootstrap/argocd` 后应用；`platform/cloudsentinel-secrets` 负责物化 Secret，使数据初始化和 PreSync Migration 开始前凭证已存在。
+`validate-gitops` 对当前激活路径拒绝占位符，并渲染两个 Compact 应用 Overlay、
+Secret Overlay、Compact 数据层与监控、Secret Store 和 Argo CD Bootstrap。
+`platform/cloudsentinel-secrets` 负责先物化 Secret，使数据初始化和 PreSync
+Migration 开始前凭证已存在。
 
-应用镜像必须使用 `crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com` 拉取；公网端点只用于 GitHub Actions 推送。Registry 远端 Secret 的 `.dockerconfigjson` 必须将该 VPC 域名作为认证服务器。ACR 个人版无生产 SLA并可能限流，滚动并发和节点缓存应由平台运行手册约束。
+北京七节点 Overlay 继续使用 ACR VPC Endpoint。河源 Compact Overlay 使用
+`crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com` 公网 Endpoint，源
+`.dockerconfigjson` 必须包含同一个公网认证服务器。ACR 个人版和跨地域公网拉取
+无生产 SLA并可能限流，只适用于当前学习集群。
 
 ## 分支保护
 

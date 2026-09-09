@@ -1,0 +1,61 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../lab
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: StatefulSet
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/nodeSelector
+        value:
+          workload.cloudsentinel.io/data: "true"
+  - target:
+      group: batch
+      version: v1
+      kind: Job
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/nodeSelector
+        value:
+          workload.cloudsentinel.io/data: "true"
+  - target:
+      group: batch
+      version: v1
+      kind: CronJob
+    patch: |-
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/nodeSelector
+        value:
+          workload.cloudsentinel.io/data: "true"
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-lab-mysql
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-01
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-lab-redis
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-01
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-lab-backup
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-01
+images:
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-mysql
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-mysql
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-redis
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-redis

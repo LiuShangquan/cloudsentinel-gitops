@@ -1,0 +1,67 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../lab
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/nodeSelector
+        value:
+          workload.cloudsentinel.io/monitoring: "true"
+  - target:
+      group: apps
+      version: v1
+      kind: StatefulSet
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/nodeSelector
+        value:
+          workload.cloudsentinel.io/monitoring: "true"
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-monitoring-prometheus
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-02
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-monitoring-alertmanager
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-02
+  - target:
+      version: v1
+      kind: PersistentVolume
+      name: cloudsentinel-monitoring-grafana
+    patch: |-
+      - op: replace
+        path: /spec/nodeAffinity/required/nodeSelectorTerms/0/matchExpressions/0/values/0
+        value: worker-02
+  - target:
+      group: networking.k8s.io
+      version: v1
+      kind: NetworkPolicy
+      name: allow-control-plane-observability
+    patch: |-
+      - op: replace
+        path: /spec/ingress/0/from
+        value:
+          - ipBlock:
+              cidr: 172.23.122.231/32
+images:
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-prometheus
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-prometheus
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-alertmanager
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-alertmanager
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-grafana
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-grafana
+  - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-metrics-server
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-metrics-server
