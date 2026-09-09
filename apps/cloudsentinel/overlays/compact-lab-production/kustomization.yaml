@@ -1,8 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: cloudsentinel-production
 resources:
   - ../lab-production
+  - web-public.yaml
 patches:
+  - path: web-public-deployment-patch.yaml
   - target:
       group: apps
       version: v1
@@ -32,6 +35,9 @@ patches:
         value:
           workload.cloudsentinel.io/app: "true"
 images:
+  - name: cloudsentinel-web
+    newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-web
+    digest: sha256:e309dfea21b04975d0fefe809259fea31b6a32f06ace25c69113e5f03c4c8b0d
   - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-api
     newName: crpi-1s64ln3ptbvgkqof.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-api
   - name: crpi-1s64ln3ptbvgkqof-vpc.cn-beijing.personal.cr.aliyuncs.com/cloudsentinel0306/cloudsentinel-worker
