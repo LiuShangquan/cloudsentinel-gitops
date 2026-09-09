@@ -99,6 +99,7 @@ jobs:
           test "$(grep -c 'cidr: 172.23.122.231/32' "${monitoring_output}")" -eq 1
           test "$(grep -c 'cidr: 172.23.122.232/32' "${monitoring_output}")" -eq 1
           test "$(grep -c 'cidr: 172.23.122.233/32' "${monitoring_output}")" -eq 1
+          test "$(grep -c 'cidr: 10.244.184.65/32' "${monitoring_output}")" -eq 1
           monitoring_image_count="$(grep -Ec 'image: crpi-1s64ln3ptbvgkqof\.cn-beijing\.personal\.cr\.aliyuncs\.com/cloudsentinel0306/cloudsentinel-(prometheus|alertmanager|grafana|metrics-server)@sha256:[0-9a-f]{64}$' "${monitoring_output}")"
           test "${monitoring_image_count}" -eq 4
           grep -Fq 'credentials_file: /etc/alertmanager/secrets/webhook-token' "${monitoring_output}"
